@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Be My Valentine?</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            background-color: #fce4ec;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            touch-action: none;
+        }
+
+        .container {
+            text-align: center;
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            position: relative;
+            width: 90%;
+            max-width: 400px;
+            z-index: 1;
+        }
+
+        h1 { color: #d81b60; margin-bottom: 1.5rem; font-size: 1.4rem; line-height: 1.4; }
+
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            min-height: 60px;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            font-weight: bold;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        #yesBtn { background-color: #4caf50; color: white; box-shadow: 0 4px 6px rgba(76, 175, 80, 0.3); z-index: 10; }
+        #noBtn { background-color: #f44336; color: white; box-shadow: 0 4px 6px rgba(244, 67, 54, 0.3); position: absolute; transition: top 0.2s, left 0.2s; }
+
+        .success-content { display: none; }
+        .success-content h2 { color: #d81b60; font-size: 1.8rem; margin-bottom: 10px;}
+        img { width: 100%; max-width: 250px; border-radius: 15px; margin-top: 15px; }
+
+        /* Music Control (Optional Visual) */
+        #music-indicator {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            font-size: 12px;
+            color: #888;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body onclick="playMusic()" ontouchstart="playMusic()">
+
+    <audio id="bgMusic" loop>
+        <source src="song.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <div class="container" id="mainContainer">
+        <div id="askSection">
+            <h1 id="question">சினேகா, உங்க அம்மா ஒரு குரங்கு தானே ஆமாவா ? இல்லயா ? ❤️</h1>
+            <div class="btn-container">
+                <button id="yesBtn" onclick="celebrate()">ஆமா</button>
+                <div style="width: 80px;"></div> 
+                <button id="noBtn">இல்ல</button>
+            </div>
+        </div>
+
+        <div id="successSection" class="success-content">
+            <h2>செல்லம்  |😘| 🎉</h2>
+            <p>இப்போதான் நீ என் பொண்டாட்டி  😘</p>
+            <img src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExNmdoY3EzZzB6bTJ6bTAzaHliZTZlb2kyNWxya3pra2tzNTE2NmNndSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/LbC9yf16pIS74lXTDc/giphy.gif" alt="Happy Dance">
+            <p style="margin-top:15px; color:#e91e63; font-weight:bold;">ஐ லவ் யூ சினேகா ❤️</p>
+        </div>
+    </div>
+    <div id="music-indicator">🎵 Music Ready</div>
+
+    <script>
+        const noBtn = document.getElementById('noBtn');
+        const audio = document.getElementById('bgMusic');
+        let musicStarted = false;
+
+        // Music Play Function - Triggers on first interaction
+        function playMusic() {
+            if (!musicStarted) {
+                audio.play().then(() => {
+                    musicStarted = true;
+                    document.getElementById('music-indicator').innerText = "🎵 Playing...";
+                }).catch(e => console.log("Audio play failed asking for interaction"));
+            }
+        }
+
+        // Mobile & Desktop Event Listeners for Moving Button
+        noBtn.addEventListener('mouseover', moveButton);
+        noBtn.addEventListener('touchstart', function(e) { e.preventDefault(); moveButton(); playMusic(); });
+        noBtn.addEventListener('click', function(e) { e.preventDefault(); moveButton(); });
+
+        function moveButton() {
+            noBtn.style.position = 'fixed'; 
+            const btnWidth = noBtn.offsetWidth;
+            const btnHeight = noBtn.offsetHeight;
+            const maxX = window.innerWidth - btnWidth - 20;
+            const maxY = window.innerHeight - btnHeight - 20;
+            const x = Math.random() * maxX;
+            const y = Math.random() * maxY;
+            noBtn.style.left = Math.max(10, x) + 'px';
+            noBtn.style.top = Math.max(10, y) + 'px';
+            
+            // Ensure music plays if they try to catch the button
+            playMusic();
+        }
+
+        function celebrate() {
+            document.getElementById('askSection').style.display = 'none';
+            document.getElementById('successSection').style.display = 'block';
+            document.body.style.backgroundColor = "#ffebee";
+            
+            // Play music if not already playing
+            playMusic();
+            
+            triggerConfetti();
+        }
+
+        function triggerConfetti() {
+            const count = 200;
+            const defaults = { origin: { y: 0.7 } };
+            function fire(particleRatio, opts) {
+                confetti(Object.assign({}, defaults, opts, { particleCount: Math.floor(count * particleRatio) }));
+            }
+            fire(0.25, { spread: 26, startVelocity: 55 });
+            fire(0.2, { spread: 60 });
+            fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+            fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
+            fire(0.1, { spread: 120, startVelocity: 45 });
+        }
+    </script>
+</body>
+</html>
